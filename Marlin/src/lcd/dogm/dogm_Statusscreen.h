@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -598,6 +598,105 @@
 
 #endif // !STATUS_HEATERS_WIDTH && !STATUS_HOTEND1_WIDTH
 
+// LASER / SPINDLE
+#if !STATUS_CUTTER_WIDTH && HAS_CUTTER
+  #define STATUS_CUTTER_WIDTH 24
+  #define STATUS_CUTTER_X 80
+  #if ENABLED(LASER_FEATURE)
+    #ifdef STATUS_CUTTER_ANIM
+      const unsigned char status_cutter_on_bmp[] PROGMEM = {
+        B00000000,B00100100,B00000000,
+        B00000000,B01100110,B00000000,
+        B00000000,B11000011,B00000000,
+        B00000001,B10011001,B10000000,
+        B00000011,B00100100,B11000000,
+        B00000000,B01000010,B00000000,
+        B00000000,B01000010,B00000000,
+        B00000011,B00100100,B11000000,
+        B00000001,B10011001,B10000000,
+        B00000000,B11000011,B00000000,
+        B00000000,B01100110,B00000000,
+        B00000000,B00100100,B00000000
+      };
+      const unsigned char status_cutter_bmp[] PROGMEM = {
+        B00000000,B00100100,B00000000,
+        B00000000,B01100110,B00000000,
+        B00000000,B00000000,B00000000,
+        B00000001,B00000000,B10000000,
+        B00000011,B00000000,B11000000,
+        B00000000,B00011000,B00000000,
+        B00000000,B00011000,B00000000,
+        B00000011,B00000000,B11000000,
+        B00000001,B00000000,B10000000,
+        B00000000,B00000000,B00000000,
+        B00000000,B01100110,B00000000,
+        B00000000,B00100100,B00000000
+      };
+    #else
+      const unsigned char status_cutter_bmp[] PROGMEM = {
+        B00000000,B00100100,B00000000,
+        B00000000,B01100110,B00000000,
+        B00000000,B11000011,B00000000,
+        B00000001,B10000001,B10000000,
+        B00000011,B00000000,B11000000,
+        B00000000,B00000000,B00000000,
+        B00000000,B00000000,B00000000,
+        B00000011,B00000000,B11000000,
+        B00000001,B10000001,B10000000,
+        B00000000,B11000011,B00000000,
+        B00000000,B01100110,B00000000,
+        B00000000,B00100100,B00000000
+      };
+    #endif
+  #else
+    #ifdef STATUS_CUTTER_ANIM
+      const unsigned char status_cutter_on_bmp[] PROGMEM = {
+        B00000001,B11111110,B10000000,
+        B00000000,B11000000,B00000000,
+        B00000001,B10000000,B10000000,
+        B00000001,B00000000,B10000000,
+        B00000001,B11111100,B10000000,
+        B00000000,B11100000,B00000000,
+        B00000001,B11000000,B10000000,
+        B00000000,B10000001,B00000000,
+        B00000000,B01111010,B00000000,
+        B00000000,B00110100,B00000000,
+        B00000000,B00011000,B00000000,
+        B00000000,B00000000,B00000000
+      };
+      const unsigned char status_cutter_bmp[] PROGMEM = {
+        B00000001,B11111110,B10000000,
+        B00000000,B11000000,B00000000,
+        B00000001,B10000000,B10000000,
+        B00000001,B00000000,B10000000,
+        B00000001,B11111100,B10000000,
+        B00000000,B11100000,B00000000,
+        B00000001,B11000000,B10000000,
+        B00000000,B10000001,B00000000,
+        B00000000,B01111010,B00000000,
+        B00000000,B00110100,B00000000,
+        B00000000,B00011000,B00000000,
+        B00000000,B00000000,B00000000
+      };
+    #else
+      const unsigned char status_cutter_bmp[] PROGMEM = {
+        B00000001,B11000010,B10000000,
+        B00000001,B00011100,B10000000,
+        B00000000,B11100001,B00000000,
+        B00000001,B00001110,B10000000,
+        B00000001,B01110000,B10000000,
+        B00000000,B10000111,B10000000,
+        B00000001,B00111111,B10000000,
+        B00000000,B11111111,B00000000,
+        B00000000,B01111110,B00000000,
+        B00000000,B00111100,B00000000,
+        B00000000,B00011000,B00000000,
+        B00000000,B00000000,B00000000
+      };
+    #endif
+  #endif
+#endif // LASER / SPINDLE
+
 //
 // Default Status Screen Bed bitmaps
 //
@@ -686,7 +785,9 @@
     #endif
 
   #endif
-#else
+#endif
+
+#ifndef STATUS_BED_WIDTH
   #define STATUS_BED_WIDTH 0
 #endif
 
@@ -753,7 +854,9 @@
     };
 
   #endif
-#else // HAS_HEATED_CHAMBER
+#endif
+
+#ifndef STATUS_CHAMBER_WIDTH
   #define STATUS_CHAMBER_WIDTH 0
 #endif
 
@@ -1206,20 +1309,42 @@
   #define STATUS_FAN_WIDTH 0
 #endif
 
+#define _EXTRA_WIDTH (STATUS_FAN_WIDTH + STATUS_CHAMBER_WIDTH + STATUS_BED_WIDTH)
+
+//
+// Heater Bitmap X Space Requirements
+//
+#if !defined(STATUS_HEATERS_XSPACE) && (STATUS_HOTEND1_WIDTH || STATUS_HEATERS_WIDTH)
+  #if (HOTENDS == 3 || HOTENDS == 4) && ENABLED(STATUS_COMBINE_HEATERS)
+    // If more heaters or they're combined, 3 bytes
+    #define STATUS_HEATERS_XSPACE 24
+  #elif STATUS_LOGO_WIDTH > (LCD_PIXEL_WIDTH - (_EXTRA_WIDTH) - 26 * (HOTENDS)) // 128 - (20 + 24 + 26) == 58
+    // If the logo won't fit at 26 width
+    #define STATUS_HEATERS_XSPACE 24
+  #else
+    #define STATUS_HEATERS_XSPACE 26
+  #endif
+#endif
+
 #if ENABLED(CUSTOM_STATUS_SCREEN_IMAGE)
 
-  #if STATUS_HOTEND1_WIDTH
-    #define HAS_SPACES ((LCD_PIXEL_WIDTH - (HOTENDS * STATUS_HOTEND1_WIDTH) - STATUS_BED_WIDTH - STATUS_CHAMBER_WIDTH - STATUS_FAN_WIDTH - 24) < STATUS_LOGO_WIDTH ? true : false)
+  //
+  // Disable the logo bitmap if insufficient space
+  //
+  #if STATUS_HEATERS_XSPACE
+    #define _HEATERS_WIDTH (HOTENDS * (STATUS_HEATERS_XSPACE)) // as many hotends as possible
   #elif STATUS_HEATERS_WIDTH
-    #define HAS_SPACES (((LCD_PIXEL_WIDTH - STATUS_HEATERS_WIDTH - STATUS_BED_WIDTH - STATUS_CHAMBER_WIDTH - STATUS_FAN_WIDTH - 20) < STATUS_LOGO_WIDTH) ? true : false)
+    #define _HEATERS_WIDTH STATUS_HEATERS_WIDTH
+  #elif HOTENDS
+    #error "Status screen heaters region was not specified."
   #endif
-
-  #if HAS_SPACES
+  #if STATUS_LOGO_WIDTH > (LCD_PIXEL_WIDTH - (_EXTRA_WIDTH + _HEATERS_WIDTH))
+    #warning "Unable to fit custom Status Screen logo. Disabling."
     #undef STATUS_LOGO_WIDTH
   #endif
 
   #if (HOTENDS > 1 && STATUS_LOGO_WIDTH && BED_OR_CHAMBER_OR_FAN) || (HOTENDS >= 3 && !BED_OR_CHAMBER_OR_FAN)
-    #define _STATUS_HEATERS_X(H,S,N) (((LCD_PIXEL_WIDTH - (H * (S + N)) - STATUS_LOGO_WIDTH - STATUS_BED_WIDTH - STATUS_CHAMBER_WIDTH - STATUS_FAN_WIDTH) / 2) + STATUS_LOGO_WIDTH)
+    #define _STATUS_HEATERS_X(H,S,N) ((LCD_PIXEL_WIDTH - (H * (S + N)) - (_EXTRA_WIDTH) + (STATUS_LOGO_WIDTH)) / 2)
     #if STATUS_HOTEND1_WIDTH
       #if HOTENDS > 2
         #define STATUS_HEATERS_X _STATUS_HEATERS_X(HOTENDS, STATUS_HOTEND1_WIDTH, 6)
@@ -1247,7 +1372,7 @@
     #define STATUS_LOGO_X 0
   #endif
   #ifndef STATUS_LOGO_Y
-    #define STATUS_LOGO_Y _MIN(0, 10 - (STATUS_LOGO_HEIGHT) / 2)
+    #define STATUS_LOGO_Y _MIN(0U, (10 - (STATUS_LOGO_HEIGHT) / 2))
   #endif
   #ifndef STATUS_LOGO_HEIGHT
     #define STATUS_LOGO_HEIGHT (sizeof(status_logo_bmp) / (STATUS_LOGO_BYTEWIDTH))
@@ -1259,33 +1384,21 @@
 #endif
 
 //
-// Heater Bitmap Properties
+// Hotend Heater Bitmap starting X position
 //
-#if STATUS_HOTEND1_WIDTH || STATUS_HEATERS_WIDTH
-
-  #ifndef STATUS_HEATERS_XSPACE
-    #if (HOTENDS == 3 || HOTENDS == 4) && ENABLED(STATUS_COMBINE_HEATERS)
-      #define STATUS_HEATERS_XSPACE 24
-    #else
-      #define STATUS_HEATERS_XSPACE 26 // Like the included bitmaps
-    #endif
-  #endif
-
-  #ifndef STATUS_HEATERS_X
-    #if STATUS_LOGO_BYTEWIDTH
-      #define STATUS_HEATERS_X (STATUS_LOGO_BYTEWIDTH * 8)
-    #elif ((STATUS_CHAMBER_WIDTH || STATUS_FAN_WIDTH) && (STATUS_BED_WIDTH  && STATUS_HOTEND_BITMAPS == 3)) || \
-          ((STATUS_CHAMBER_WIDTH || STATUS_FAN_WIDTH  ||  STATUS_BED_WIDTH) && STATUS_HOTEND_BITMAPS == 4)
+#if !defined(STATUS_HEATERS_X) && (STATUS_HOTEND1_WIDTH || STATUS_HEATERS_WIDTH)
+  #if STATUS_LOGO_BYTEWIDTH
+    #define STATUS_HEATERS_X (STATUS_LOGO_BYTEWIDTH * 8)
+  #elif ((STATUS_CHAMBER_WIDTH || STATUS_FAN_WIDTH) && (STATUS_BED_WIDTH  && STATUS_HOTEND_BITMAPS == 3)) || \
+        ((STATUS_CHAMBER_WIDTH || STATUS_FAN_WIDTH  ||  STATUS_BED_WIDTH) && STATUS_HOTEND_BITMAPS == 4)
+    #define STATUS_HEATERS_X 5
+  #else
+    #if ENABLED(STATUS_COMBINE_HEATERS) && HAS_HEATED_BED && HOTENDS <= 4
       #define STATUS_HEATERS_X 5
     #else
-      #if ENABLED(STATUS_COMBINE_HEATERS) && HAS_HEATED_BED && HOTENDS <= 4
-        #define STATUS_HEATERS_X 5
-      #else
-        #define STATUS_HEATERS_X 8 // Like the included bitmaps
-      #endif
+      #define STATUS_HEATERS_X 8 // Like the included bitmaps
     #endif
   #endif
-
 #endif
 
 #if STATUS_HOTEND1_WIDTH
@@ -1452,7 +1565,53 @@
 
 #else // HOTENDS == 0
 
-  //#error "Incomplete status header"
+  #define STATUS_HOTEND_TEXT_X(N) 0
+  #define STATUS_HEATERS_Y 0
+
+#endif
+
+//
+// Cutter Bitmap Properties
+//
+#ifndef STATUS_CUTTER_BYTEWIDTH
+  #define STATUS_CUTTER_BYTEWIDTH BW(STATUS_CUTTER_WIDTH)
+#endif
+#if STATUS_CUTTER_WIDTH
+
+  #ifndef STATUS_CUTTER_X
+    #define STATUS_CUTTER_X (LCD_PIXEL_WIDTH - (STATUS_CUTTER_BYTEWIDTH + STATUS_CUTTER_BYTEWIDTH) * 8)
+  #endif
+
+  #ifndef STATUS_CUTTER_HEIGHT
+    #ifdef STATUS_CUTTER_ANIM
+      #define STATUS_CUTTER_HEIGHT(S) ((S) ? sizeof(status_cutter_on_bmp) / (STATUS_CUTTER_BYTEWIDTH) : sizeof(status_cutter_bmp) / (STATUS_CUTTER_BYTEWIDTH))
+    #else
+      #define STATUS_CUTTER_HEIGHT(S) (sizeof(status_cutter_bmp) / (STATUS_CUTTER_BYTEWIDTH))
+    #endif
+  #endif
+
+  #ifndef STATUS_CUTTER_Y
+    #define STATUS_CUTTER_Y(S) 4
+  #endif
+
+  #ifndef STATUS_CUTTER_TEXT_X
+    #define STATUS_CUTTER_TEXT_X (STATUS_CUTTER_X -1)
+  #endif
+
+  #ifndef STATUS_CUTTER_TEXT_Y
+    #define STATUS_CUTTER_TEXT_Y 28
+  #endif
+
+  static_assert(
+    sizeof(status_cutter_bmp) == (STATUS_CUTTER_BYTEWIDTH) * (STATUS_CUTTER_HEIGHT(0)),
+    "Status cutter bitmap (status_cutter_bmp) dimensions don't match data."
+  );
+  #ifdef STATUS_CUTTER_ANIM
+    static_assert(
+      sizeof(status_cutter_on_bmp) == (STATUS_CUTTER_BYTEWIDTH) * (STATUS_CUTTER_HEIGHT(1)),
+      "Status cutter bitmap (status_cutter_on_bmp) dimensions don't match data."
+    );
+  #endif
 
 #endif
 
@@ -1571,3 +1730,17 @@
     #endif
   #endif
 #endif
+
+#define DO_DRAW_LOGO (STATUS_LOGO_WIDTH && ENABLED(CUSTOM_STATUS_SCREEN_IMAGE))
+#define DO_DRAW_HOTENDS (HOTENDS > 0)
+#define DO_DRAW_BED (HAS_HEATED_BED && HOTENDS <= 4)
+#define DO_DRAW_CUTTER (HAS_CUTTER && !DO_DRAW_BED)
+#define DO_DRAW_CHAMBER (HAS_TEMP_CHAMBER && STATUS_CHAMBER_WIDTH && HOTENDS <= 4)
+#define DO_DRAW_FAN (HAS_FAN0 && STATUS_FAN_WIDTH && HOTENDS <= 4 && defined(STATUS_FAN_FRAMES))
+
+#define ANIM_HOTEND (HOTENDS && ENABLED(STATUS_HOTEND_ANIM))
+#define ANIM_BED (DO_DRAW_BED && ENABLED(STATUS_BED_ANIM))
+#define ANIM_CHAMBER (DO_DRAW_CHAMBER && ENABLED(STATUS_CHAMBER_ANIM))
+#define ANIM_CUTTER (DO_DRAW_CUTTER && ENABLED(STATUS_CUTTER_ANIM))
+
+#define ANIM_HBCC (ANIM_HOTEND || ANIM_BED || ANIM_CHAMBER || ANIM_CUTTER)
