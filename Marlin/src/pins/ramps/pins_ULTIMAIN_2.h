@@ -45,7 +45,8 @@
 //
 #define X_STOP_PIN                            22
 #define Y_STOP_PIN                            26
-#define Z_STOP_PIN                            29
+//#define Z_STOP_PIN         29
+#define Z_STOP_PIN         69 // BL_Touch, optical endstop
 
 //
 // Steppers
