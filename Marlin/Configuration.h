@@ -897,8 +897,8 @@
  */
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
-#define AUTO_BED_LEVELING_BILINEAR
-//#define AUTO_BED_LEVELING_UBL
+//#define AUTO_BED_LEVELING_BILINEAR
+#define AUTO_BED_LEVELING_UBL
 //#define MESH_BED_LEVELING
 
 /**
@@ -1007,15 +1007,15 @@
   //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
 
   #define MESH_INSET 1              // Mesh inset margin on print area
-  #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
+  #define GRID_MAX_POINTS_X 15      // Don't use more than 15 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
-  #define UBL_PROBE_PT_1_X 35       // Probing points for 3-Point leveling of the mesh
-  #define UBL_PROBE_PT_1_Y 165
-  #define UBL_PROBE_PT_2_X 35
-  #define UBL_PROBE_PT_2_Y 35
-  #define UBL_PROBE_PT_3_X 165
-  #define UBL_PROBE_PT_3_Y 35
+  #define UBL_PROBE_PT_1_X 39       // Probing points for 3-Point leveling of the mesh
+  #define UBL_PROBE_PT_1_Y 180
+  #define UBL_PROBE_PT_2_X 39
+  #define UBL_PROBE_PT_2_Y 20
+  #define UBL_PROBE_PT_3_X 180
+  #define UBL_PROBE_PT_3_Y 20
 
   #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle
   #define UBL_SAVE_ACTIVE_ON_M500   // Save the currently active mesh in the current slot on M500
@@ -1027,7 +1027,7 @@
   //===========================================================================
 
   #define MESH_INSET 10          // Mesh inset margin on print area
-  #define GRID_MAX_POINTS_X 3    // Don't use more than 7 points per axis, implementation limited.
+  #define GRID_MAX_POINTS_X 7    // Don't use more than 7 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest Z at Z_MIN_POS
